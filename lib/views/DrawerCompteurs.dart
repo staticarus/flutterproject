@@ -5,6 +5,7 @@ import 'package:projet/views/Meter3.dart';
 import 'package:projet/views/Picture.dart';
 import 'package:projet/views/ListenerTest.dart';
 import 'package:projet/views/Firebase.dart';
+import 'package:projet/views/CropperTest.dart';
 
 class DrawerCompteurs extends StatelessWidget {
   @override
@@ -77,6 +78,11 @@ class DrawerCompteurs extends StatelessWidget {
               title: Text('Listener Test'),
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ListenerTest())),
             ),
+            // ListTile(
+            //   leading: Icon(Icons.pin_drop, color: Colors.purple),
+            //   title: Text('Cropper Test'),
+            //   onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => CropperTest())),
+            // ),
             Divider(height: 1,),
             ListTile(
               leading: Icon(Icons.miscellaneous_services),

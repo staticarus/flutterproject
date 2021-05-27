@@ -68,5 +68,3 @@ class _Picture extends State<Picture> {
     );
   }
 }
-
-    
