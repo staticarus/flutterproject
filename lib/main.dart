@@ -1,68 +1,59 @@
 import 'package:flutter/material.dart';
-import 'package:projet/views/HomePage.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:projetflutter/views/HomePage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(FlutterFire());
 }
 
-// Initialisation de FlutterFire
+/// We are using a StatefulWidget such that we only create the [Future] once,
+/// no matter how many times our widget rebuild.
+/// If we used a [StatelessWidget], in the event where [App] is rebuilt, that
+/// would re-initialize FlutterFire and make our application re-enter loading state,
+/// which is undesired.
 class FlutterFire extends StatefulWidget {
+  // Create the initialization Future outside of `build`:
+  @override
   _FlutterFireState createState() => _FlutterFireState();
 }
 
-class _FlutterFireState extends State<FlutterFire> {
-  // Set default `_initialized` and `_error` state to false
-  bool _initialized = false;
-  bool _error = false;
+class _FlutterFireState extends State<FlutterFire> { /* Initialisation de la librairie Flutter pour interagir avec Firebase */
 
-  // Define an async function to initialize FlutterFire
-  void initializeFlutterFire() async {
-    try {
-      // Wait for Firebase to initialize and set `_initialized` state to true
-      await Firebase.initializeApp();
-      setState(() {
-        _initialized = true;
-      });
-    } catch(e) {
-      // Set `_error` state to true if Firebase initialization fails
-      setState(() {
-        _error = true;
-      });
-    }
-  }
+  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
 
   @override
-  void initState() {
-    initializeFlutterFire();
-    super.initState();
-  }
+  Widget build(BuildContext context) { /* Initialisation */
+    return FutureBuilder(
+      future: _initialization,
+      builder: (context, snapshot) {
 
-  @override
-  Widget build(BuildContext context) {
-    // Show error message if initialization failed
-    if(_error) {
-      print('Erreur lors de l\'initialisation de FlutterFire. (0)');
-    }
-    // Show a loader until FlutterFire is initialized
-    if (!_initialized) {
-      return loading();
-    }
-    print('FlutterFire est correctement initialisé ! (1)');
-    return MyApp();
-  }
+        if (snapshot.hasError) {
+          print('Erreur lors de l\'initialisation de FlutterFire. (0)');
+        }
+        if (snapshot.connectionState == ConnectionState.done) {
+          print('FlutterFire est correctement initialisé ! (1)');
+          firebaseAuth();
+        }
 
-  loading(){
-    return CircularProgressIndicator(
-      strokeWidth: 5,
+        return MyApp(); /* Lancement de l'application principale */
+
+      },
     );
   }
+
+  void firebaseAuth() async {
+
+    UserCredential userCredential = await FirebaseAuth.instance.signInAnonymously();
+    User user = userCredential.user;
+
+  }
+
 }
 
-
-// Si Initialisation réussie, lancement de l'application principale
+// Lancement de l'application principale
 class MyApp extends StatelessWidget {
-  // Root of the application
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -73,7 +64,6 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.green,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      //home: Home(title: 'Flutter Demo Home Page'),
       home: HomePage(),
     );
   }
